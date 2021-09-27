@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+  <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head> 
+  <body>
+    <canvas id="myCanvas"></canvas>
+    <script>
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+
+	function resizeCanvas() {
+	  canvas.width = window.innerWidth * devicePixelRatio
+	  canvas.height = window.innerHeight * devicePixelRatio
+	  paint();
+	}
+	  resizeCanvas();
+	  window.onresize = resizeCanvas
+
+
+	function multiplyFactors(factors, mask){
+	    //die Faktoren miteinander multiplizieren
+		a=1;
+//		console.log("multiplyFactors: " + factors + "("+factors.length+") - mask=" + (mask>>>0).toString(2));
+		for(j=0;j<factors.length;j++){
+//		  console.log("j="+j+", shifted="+(mask >>> j).toString(2));
+		  if(mask>>>j&1){
+//		    console.log((mask >>> j).toString(2)+"&1 is true");
+		    a=a*factors[j];
+		  }
+		}
+		return a;
+	}
+	
+	function paint(){
+	  const factors = [2, 2, 3, 3, 5];
+	  
+	  x=1
+	  xmask=0;
+	  // für alle Kombinationen der Faktoren:
+	  //   von 0 bis 2^factors.length-1 hochzählen
+	  for(i=0;i<(2**(factors.length));i++){
+//	  for(i=0;i<2;i++){
+	    xmask=i;
+		//z.B.:
+		//[2, 2, 3, 3, 5]
+		// 1  0  0  1  1 = 19
+		ymask=~xmask&(2**factors.length-1);
+//		console.log("xmask="+xmask.toString(2)+", ymask="+ymask.toString(2));
+
+		x=multiplyFactors(factors, xmask);
+	    //das Komplement der Faktoren (alle anderen) miteinander multiplizieren ==> y
+		y=multiplyFactors(factors, ymask);
+	    console.log("xmask="+xmask.toString(2)+" - x="+x+", y="+y);
+		paintRect(10,10,y*8,x*8);
+	  }
+	}
+	
+	function paintRect(x,y,w,h,color='red'){
+	  context.strokeStyle=color;
+	  context.strokeRect(x,y,w,h);
+      context.font = '8pt Calibri';
+      context.fillStyle = 'black';
+	  context.fillText(w/8, x+w/2-10, y+h+10);
+	  context.fillText(h/8, x+w+5, y+h/2+5);
+	}
+    </script>
+  </body>
+</html> 
